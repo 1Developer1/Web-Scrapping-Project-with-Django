@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Web Sayfası</title>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-light bg-light">
+        <form class="form-inline" method="GET" action="{% url 'search_and_scrape' %}">
+            <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Ara</button>
+        </form>
+
+        <form class="form-inline" method="GET" action="{% url 'search_and_fetch' %}">
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Göster</button>
+        </form>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col">
+                <h2>Yayınlar</h2>
+            </div>
+            <div class="col">
+                <form action="#" method="GET">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <select id="sort-by" class="form-control" name="sort-by">
+                                <option value="date-desc">En Yeni</option>
+                                <option value="date-asc">En Eski</option>
+                                <option value="citation-desc">En Fazla Atıf</option>
+                                <option value="citation-asc">En Az Atıf</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <button type="submit" class="btn btn-primary">Sırala</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr>
+
+        {% for yayin in yayinlar %}
+        <div class="card mb-3">
+            <h5 class="card-header">{{ yayin.yayinad }}</h5>
+            <div class="card-body">
+                <p class="card-text">{{ yayin.icerik }}</p>
+                <a class="btn btn-primary" data-toggle="collapse" href="#collapse{{ forloop.counter }}" role="button"
+                    aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                    Detay Göster
+                </a>
+                <a class="btn btn-success ml-2" href="{{ yayin.detay_link }}" role="button" target="_blank">Pdf
+                    Sayfası</a>
+                <div class="collapse" id="collapse{{ forloop.counter }}">
+                    <div class="card card-body">
+                        <h5 class="card-title">Yazarlar</h5>
+                        <p class="card-text">{{ yayin.yazarlar }}</p>
+                        <h5 class="card-title">Yayın Türü</h5>
+                        <p class="card-text">{{ yayin.yayinturu }}</p>
+                        <h5 class="card-title">Yayın Dili</h5>
+                        <p class="card-text">{{ yayin.dil }}</p>
+                        <h5 class="card-title">Yayın Konular</h5>
+                        <p class="card-text">{{ yayin.konular }}</p>
+                        <h5 class="card-title">Yayın Tarihi</h5>
+                        <p class="card-text">{{ yayin.yayintarihi }}</p>
+                        <h5 class="card-title">Yayımlanma Yılı</h5>
+                        <p class="card-text">{{ yayin.yayinlanma_yili }}</p>
+                        <h5 class="card-title">Anahtar Kelimeler</h5>
+                        <p class="card-text">{{ yayin.Anahtar_Kelimeler }}</p>
+                        <h5 class="card-title">Özet</h5>
+                        <p class="card-text">{{ yayin.ozet }}</p>
+                        <h5 class="card-title">Referanslar</h5>
+                        <p class="card-text">{{ yayin.referanslar }}</p>
+                        <h5 class="card-title">Alıntı Sayısı</h5>
+                        <p class="card-text">{{ yayin.alinti_sayisi }}</p>
+                        <h5 class="card-title">DOI</h5>
+                        <p class="card-text">{{ yayin.doi }}</p>
+                        <h5 class="card-title">Detay Link</h5>
+                        <p class="card-text">{{ yayin.detay_link }}</p>
+                        <button class="btn btn-info ml-2"
+                            onclick="downloadPDF('{{ yayin.indirme_linki }}')">PDF İNDİR</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+    <!-- Filtreleme Bölümü -->
+    <div class="container mt-4">
+        <form action="{% url 'filter_yayinlar' %}" method="GET">
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="yayin_ad">Yayın Adı:</label>
+                    <input type="text" class="form-control" id="yayin_ad" name="yayin_ad">
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="yayin_turu">Yayın Türü:</label>
+                    <select id="yayin_turu" class="form-control" name="yayin_turu">
+                        <option value="">Tümü</option>
+                        <option value="kitap">Kitap</option>
+                        <option value="makale">Makale</option>
+                        <option value="tez">Tez</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="submit" class="btn btn-primary mt-4">Filtrele</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script>
+        function downloadPDF(pdfURL) {
+            window.open("/download-pdf/" + pdfURL, '_blank');
+        }
+    </script>
+</body>
+
+</html>
